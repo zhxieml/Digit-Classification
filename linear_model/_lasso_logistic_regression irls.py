@@ -2,11 +2,10 @@ import numpy as np
 from numpy import random
 from numpy import linalg as LA
 
-from utils import soft_thresholding
-from utils import sigmoid
+from utils.calculation import sigmoid
 
 
-class LassoRegression():
+class LassoLogisticRegression():
     def __init__(self, alpha=1.0, batch_size=64, tolerance=1e-3, n_iter_no_change=5, learning_rate=1e-4):
         self._w = None
         self._alpha = alpha
@@ -20,7 +19,7 @@ class LassoRegression():
         self._w = random.uniform(low=-1, high=1, size=(num_feats, ))
 
         # TODO: max_iter
-        for k in range(100):
+        for k in range(1000):
             assert num_samples >= self._batch_size
             sampled = random.choice(num_samples, self._batch_size, replace=False)
             
@@ -35,13 +34,13 @@ class LassoRegression():
         return sigmoid(np.dot(X, self._w)) > threshold
     
     @staticmethod
-    def _cal_grad_1d(X, y, w, alpha, dim):
+    def _cal_grad(X, y, w):
         num_samples, _ = X.shape
         
         proj = np.dot(X, w)
-        grad_1d = np.dot(X[:, dim], 1 - 1 / (1 + np.exp(proj))) - np.dot(y, X[:, dim]) + alpha * np.sign(w[dim])
+        grad = np.dot(X.T, 1 - 1 / (1 + np.exp(proj)) - y)
         
-        return grad_1d / num_samples
+        return grad / num_samples
     
     @staticmethod
     def _cal_loss(X, y, w):
@@ -93,11 +92,21 @@ class LassoRegression():
         
         w_pseudo = self._coordinate_descent_least_squares(X_pseudo, y_pseudo, w_pseudo, init_alpha)
         
-        # Update 
-        # TODO: use backtracking line search
-        w = 0.1 * w + 0.9 * w_pseudo
+        # Update by using backtracking line search
+        # hyperparameters: alpha = 0.4, beta = 0.95
+        # NOTE: alpha here is for backtrackiing line search
+        alpha, beta = 0.4, 0.95
+        t = 1
+
+        while (self._cal_loss(X, y, w + t * w_pseudo) > self._cal_loss(X, y, w) + 
+               alpha * t * np.dot(self._cal_grad(X, y, w), w_pseudo)):
+            t *= beta  
+        
+        w += t * w_pseudo
         
         return w
+    
+    
     
     # @staticmethod
     # def _coordinate_descent_step(X, y, w, alpha):
