@@ -18,10 +18,11 @@ class LassoLogisticRegression():
     
     def fit(self, X, y, verbose=False):
         num_samples, num_feats = X.shape
-        self._w = random.uniform(low=-1, high=1, size=(num_feats, ))
         min_loss = np.inf
         count_no_change = 0
         
+        self._w = random.uniform(low=-1, high=1, size=(num_feats, ))
+
         while count_no_change < self._n_iter_no_change:
             # TODO: a better way
             if count_no_change >= 10:

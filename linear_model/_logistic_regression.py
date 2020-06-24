@@ -2,6 +2,8 @@ import numpy as np
 from numpy import random
 from numpy import linalg as LA
 
+from utils.calculation import sigmoid
+
 
 class LogisticRegression():
     # solver = ['gd', 'sgd'. 'newton']
@@ -17,8 +19,9 @@ class LogisticRegression():
         num_samples, num_feats = X.shape
         min_loss = np.inf
         count_no_change = 0
-        self._w = random.uniform(low=-1, high=1, size=(num_feats, ))
         
+        self._w = random.uniform(low=-1, high=1, size=(num_feats, ))
+
         while count_no_change < self._n_iter_no_change:
             # TODO: a better way
             if count_no_change >= 10:
@@ -27,9 +30,9 @@ class LogisticRegression():
             if self._solver == 'sgd':
                 assert num_samples >= self._batch_size
                 sampled = random.choice(num_samples, self._batch_size, replace=False)
-                loss, grad = self._cal_logistic_loss_and_grad(X[sampled, :], y[sampled], self._w)
+                loss, grad = self._cal_loss_and_grad(X[sampled, :], y[sampled], self._w)
             else:
-                loss, grad = self._cal_logistic_loss_and_grad(X, y, self._w)
+                loss, grad = self._cal_loss_and_grad(X, y, self._w)
             
             if verbose:
                 print('Loss:\t{:.4f}\tLearning rate:\t{:.3f}'.format(loss, self._learning_rate))
@@ -47,10 +50,10 @@ class LogisticRegression():
     def predict(self, X, threshold=0.5):
         assert self._w is not None
         
-        return 1 / (1 + np.exp(-1 * np.dot(X, self._w))) > threshold
+        return sigmoid(np.dot(X, self._w)) > threshold
         
     @staticmethod
-    def _cal_logistic_loss_and_grad(X, y, w):
+    def _cal_loss_and_grad(X, y, w):
         num_samples, _ = X.shape
         
         proj = np.dot(X, w)

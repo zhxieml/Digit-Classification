@@ -32,5 +32,6 @@ class LDA():
             return np.dot(X, self._w) > threshold
         
         assert self._threshold is not None
+        
         return np.dot(X, self._w) > self._threshold
         
