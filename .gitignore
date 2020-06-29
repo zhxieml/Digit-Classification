@@ -3,4 +3,7 @@
 *.code-workspace
 
 # data
-data
+data/
+
+# python
+*__pycache__
