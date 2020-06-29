@@ -7,7 +7,7 @@ from utils.calculation import sigmoid
 
 class LogisticRegression():
     # solver = ['gd', 'sgd'. 'newton']
-    def __init__(self, solver='sgd', batch_size=64, tolerance=1e-3, n_iter_no_change=5, learning_rate=1e-4):
+    def __init__(self, solver='sgd', batch_size=64, tolerance=1e-3, n_iter_no_change=15, learning_rate=1e-4):
         self._w = None
         self._solver = solver
         self._batch_size = batch_size

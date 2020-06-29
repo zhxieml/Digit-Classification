@@ -5,21 +5,18 @@ from numpy import linalg as LA
 from utils.calculation import sigmoid
 
 
-class LassoLogisticRegression():
-    def __init__(self, alpha=1.0, batch_size=64, tolerance=1e-3, n_iter_no_change=5, learning_rate=1e-4):
+class LassoLogisticRegressionIRLS():
+    def __init__(self, alpha=1.0, batch_size=64):
         self._w = None
         self._alpha = alpha
         self._batch_size = batch_size
-        self._tolerance = tolerance
-        self._n_iter_no_change = n_iter_no_change
-        self._learning_rate = learning_rate
     
     def fit(self, X, y, verbose=False):
         num_samples, num_feats = X.shape
         self._w = random.uniform(low=-1, high=1, size=(num_feats, ))
 
         # TODO: max_iter
-        for k in range(1000):
+        for k in range(500):
             assert num_samples >= self._batch_size
             sampled = random.choice(num_samples, self._batch_size, replace=False)
             
@@ -74,7 +71,7 @@ class LassoLogisticRegression():
             This solution is inspired by 'Efficient L1 Regularized Logistic Regression',
             where LARS is used instead of coordinate descent method.
         """ 
-        num_samples, num_feats = X.shape
+        _, num_feats = X.shape
         
         proj = np.dot(X, w)
         predicted = sigmoid(proj)
@@ -105,24 +102,3 @@ class LassoLogisticRegression():
         w += t * w_pseudo
         
         return w
-    
-    
-    
-    # @staticmethod
-    # def _coordinate_descent_step(X, y, w, alpha):
-    #     _, num_feats = X.shape
-        
-    #     for k in range(num_feats):
-    #         # use gradient descent to find the local minimum
-    #         for i in range(10):
-    #             proj = np.dot(X, w)
-                
-    #             f_prime = np.dot(X[:, k] ** 2 / (1 + proj), np.exp(proj) - 1 / (1 + proj))
-                
-    #             if f_prime == 0:
-    #                 break
-
-    #             f = np.dot(X[:, k] / (1 + proj), np.exp(proj)) - np.dot(y, X[:, k]) + alpha * np.sign(w[k])
-    #             w[k] -= f / f_prime
-            
-    #     return w

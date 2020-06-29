@@ -25,7 +25,7 @@ class LDA():
         self._w = np.dot(S_within_inv, X_mean_pos - X_mean_neg)
         self._threshold = 0.5 * np.dot(self._w, X_mean_pos + X_mean_neg)
     
-    def project(self, X, threshold=None):
+    def predict(self, X, threshold=None):
         assert self._w is not None
         
         if threshold is not None:

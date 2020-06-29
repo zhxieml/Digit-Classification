@@ -7,7 +7,7 @@ from utils.calculation import sigmoid
 
 class RidgeLogisticRegression():
     # solver = ['gd', 'sgd'. 'newton']
-    def __init__(self, alpha=1.0, solver='sgd', batch_size=64, tolerance=1e-3, n_iter_no_change=5, learning_rate=1e-4):
+    def __init__(self, alpha=1.0, solver='sgd', batch_size=64, tolerance=1e-3, n_iter_no_change=15, learning_rate=1e-4):
         self._w = None
         self._alpha = alpha
         self._solver = solver
@@ -26,7 +26,7 @@ class RidgeLogisticRegression():
         while count_no_change < self._n_iter_no_change:
             # TODO: a better way
             if count_no_change >= 10:
-                self._learning_rate /= 1.001
+                self._learning_rate /= 1.1
                 
             if self._solver == 'sgd':
                 assert num_samples >= self._batch_size
@@ -58,7 +58,7 @@ class RidgeLogisticRegression():
         num_samples, _ = X.shape
         
         proj = np.dot(X, w)
-        loss = np.sum(np.log(1 + np.exp(proj))) - np.dot(y, proj) + alpha * LA.norm(w) ** 2
+        loss = (np.sum(np.log(1 + np.exp(proj))) - np.dot(y, proj)) + alpha * LA.norm(w) ** 2
         grad = np.dot(X.T, 1 - 1 / (1 + np.exp(proj)) - y) + 2 * alpha * w
         
         return loss / num_samples, grad / num_samples
